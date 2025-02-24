@@ -1,11 +1,24 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Paginator from '../components/Paginator';
 
 export default function PrimeiraTela() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const screenHeight = Dimensions.get('window').height;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setCurrentPage(0);
+    }, [])
+  );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
       <Image
         style={styles.logo}
         source={require('../../assets/images/white-dog.jpg')}
@@ -16,6 +29,7 @@ export default function PrimeiraTela() {
       <Text style={styles.description}>
         Seu dia a dia mais leve. Passeadores confiáveis para cuidar do seu pet.
       </Text>
+      <Paginator pages={3} currentPage={currentPage} />
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
@@ -25,6 +39,7 @@ export default function PrimeiraTela() {
         <Text style={styles.buttonText}>Próximo</Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -33,25 +48,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    justifyContent: 'flex-start', 
   },
   logo: {
-    width: 300,
-    height: 300,
-    marginBottom: 30,
+    width: '100%',
+    height: Dimensions.get('window').height / 2,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    paddingHorizontal: 20, 
+    marginTop: 20,
   },
   description: {
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
     marginBottom: 30,
+    paddingHorizontal: 20, 
   },
   button: {
     backgroundColor: '#007AFF',
@@ -63,5 +79,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center'
   },
 });
