@@ -23,6 +23,7 @@ export default function PrimeiraTela() {
         style={styles.logo}
         source={require('../../assets/images/white-dog.jpg')}
       />
+      <View style={styles.container}>
       <Text style={styles.title}>
         Mais tempo para você, mais diversão para o seu cão. Encontre o passeador ideal agora.
       </Text>
@@ -38,6 +39,7 @@ export default function PrimeiraTela() {
       >
         <Text style={styles.buttonText}>Próximo</Text>
       </TouchableOpacity>
+      </View>
     </View>
     </SafeAreaView>
   );

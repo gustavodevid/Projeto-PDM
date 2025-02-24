@@ -22,6 +22,7 @@ return (
               style={styles.logo}
               source={require('../../assets/images/terceiro-cao.jpg')}
             />
+      <View style={styles.container}>
       <Text style={styles.title}>Seu cão merece o melhor. Encontre um passeador agora!</Text>
       <Text style={styles.description}>
       Passeios e adestramento de qualidade. Comece agora!
@@ -30,11 +31,12 @@ return (
       <TouchableOpacity
               style={styles.button}
               onPress={() => {
-                router.push('/boas-vindas/terceira-tela');
+                router.push('/auth/login');
               }}
             >
-              <Text style={styles.buttonText}>Próximo</Text>
+              <Text style={styles.buttonText}>Começar</Text>
             </TouchableOpacity>
+      </View>
     </View>
     </SafeAreaView>
   );

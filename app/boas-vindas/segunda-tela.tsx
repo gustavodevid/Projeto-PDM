@@ -23,6 +23,7 @@ export default function SegundaTela() {
               style={styles.logo}
               source={require('../../assets/images/segundo-cao.jpg')}
             />
+      <View style={styles.container}>
       <Text style={styles.title}>Passeios divertidos e personalizados para o seu melhor amigo.</Text>
       <Text style={styles.description}>
       Um mundo de descobertas e aprendizado para o seu cão.
@@ -36,6 +37,7 @@ export default function SegundaTela() {
             >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
+      </View>
     </View>
     </SafeAreaView>
   );
