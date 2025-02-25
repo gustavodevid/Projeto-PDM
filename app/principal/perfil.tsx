@@ -2,10 +2,15 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons'; // Certifique-se de instalar: npx expo install @expo/vector-icons
+import { useRouter, useFocusEffect } from 'expo-router';
 
 export default function Perfil() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  const handleEditarPerfil = () => {
+    router.push('/configuracoes/editarPerfil');
+  };
   // Dados de exemplo (substitua pelos seus dados reais)
   const pets = [
     { id: '1', nome: 'Rex', imagem: require('../../assets/images/cao-login.jpg') },
@@ -26,7 +31,7 @@ export default function Perfil() {
         </View>
 
         <View style={styles.profileContent}>
-          <TouchableOpacity style={styles.profileOption}>
+          <TouchableOpacity style={styles.profileOption} onPress={handleEditarPerfil}>
             <Ionicons name="person-outline" size={24} color="#007AFF" style={styles.optionIcon} />
             <Text style={styles.profileOptionText}>Editar Perfil</Text>
           </TouchableOpacity>

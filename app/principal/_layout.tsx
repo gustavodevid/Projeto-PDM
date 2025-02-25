@@ -25,9 +25,9 @@ export default function RootLayout() {
         tabBarStyle: styles.tabBarStyle,
       })}
     >
-      <Tabs.Screen name="home" options={{ title: 'Início' }} />
-      <Tabs.Screen name="passeios" options={{ title: 'Passeios' }} />
-      <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
+      <Tabs.Screen name="home" options={{ title: '' }} />
+      <Tabs.Screen name="passeios" options={{ title: '' }} />
+      <Tabs.Screen name="perfil" options={{ title: '' }} />
     </Tabs>
   );
 }
