@@ -17,36 +17,42 @@ export default function Cadastro() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Primeiro, os seus dados.</Text>
+      <Text style={styles.title}>Primeiro, precisamos conhecer você.</Text>
+      <Text style={styles.description}>
+          Depois, gostarámos de conhecer o seu pet.
+      </Text>
+      <Text style={styles.label}>Seu Nome</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nome"
+        placeholder="Digite seu nome completo"
         value={nome}
         onChangeText={setNome}
       />
+      <Text style={styles.label}>Seu Email</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="Insira um email válido"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
       />
+      <Text style={styles.label}>Escolha uma senha</Text>
       <TextInput
         style={styles.input}
-        placeholder="Senha"
+        placeholder="Digite uma senha forte"
         value={senha}
         onChangeText={setSenha}
         secureTextEntry
       />
       <TextInput
         style={styles.input}
-        placeholder="Confirmar Senha"
+        placeholder="Repita sua senha"
         value={confirmarSenha}
         onChangeText={setConfirmarSenha}
         secureTextEntry
       />
       <TouchableOpacity style={styles.button} onPress={handleCadastro}>
-        <Text style={styles.buttonText}>Próximo</Text>
+        <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -68,11 +74,25 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         marginTop: 20,
       },
+      description: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 30,
+        paddingHorizontal: 20, 
+      },
+      label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        alignSelf: 'flex-start',
+      },
       input: {
         height: 50,
         width:'100%',
         backgroundColor: '#f0f0f0', // Cor de fundo sutil
         borderRadius: 10,
+      
         paddingHorizontal: 15,
         marginBottom: 15,
         fontSize: 16,
