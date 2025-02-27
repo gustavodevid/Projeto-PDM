@@ -11,6 +11,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config';
 
 interface CadastroPetProps {
   onPetCadastrado: () => void; 
@@ -58,7 +59,7 @@ const CadastroPet: React.FC<CadastroPetProps> = ({ onPetCadastrado }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/v1/pet', {
+      const response = await axios.post(`${config.API_URL}/pet`, {
         nome,
         raca,
         idade: parseInt(idade),
@@ -121,35 +122,86 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#333', // Cor mais suave
+    textAlign: 'center', // Centralizar o título
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 10,
+    borderColor: '#ddd', // Cor da borda mais suave
+    padding: 15, // Aumentar o padding para melhor toque
+    marginBottom: 15, // Aumentar a margem para melhor espaçamento
+    borderRadius: 8, // Bordas arredondadas
+    backgroundColor: '#f9f9f9', // Fundo levemente cinza
+    fontSize: 16,
+    color: '#333',
   },
   imagePicker: {
-    backgroundColor: '#eee',
-    padding: 10,
+    backgroundColor: '#e6f7ff', // Cor de fundo mais suave
+    padding: 15,
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#b3e0ff', // Cor da borda correspondente
   },
   imagePickerText: {
     fontSize: 16,
+    color: '#007bff', // Cor do texto mais visível
   },
   imagePreview: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
+    width: 120, // Aumentar o tamanho da pré-visualização
+    height: 120,
+    borderRadius: 60, // Tornar circular
+    marginBottom: 20,
+    alignSelf: 'center', // Centralizar a imagem
   },
   button: {
-    backgroundColor: 'blue',
-    padding: 15,
+    backgroundColor: '#007bff', // Cor do botão mais moderna
+    padding: 18, // Aumentar o padding
     alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: '#000', // Adicionar sombra para profundidade
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18, // Aumentar o tamanho do texto
+    fontWeight: '600', // Peso da fonte mais forte
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 12, // Bordas arredondadas para o modal
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '90%', // Largura relativa para melhor responsividade
+  },
+  closeButton: {
+    backgroundColor: '#ccc', // Cor do botão de fechar mais neutra
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 20,
+    width: '40%', // Largura relativa para o botão de fechar
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

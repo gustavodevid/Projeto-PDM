@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import CadastroPet from '../pet/CadastroPet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import config from '../../config';
 
 export default function Perfil() {
   const router = useRouter();

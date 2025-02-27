@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import styles from '../styles/home.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import config from '../../config';
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -25,7 +26,7 @@ export default function Home() {
 
     const fetchPasseadores = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/v1/passeador');
+        const response = await axios.get(`${config.API_URL}/passeador`);
         setPasseadores(response.data);
       } catch (error) {
         console.error('Erro ao buscar passeadores:', error);

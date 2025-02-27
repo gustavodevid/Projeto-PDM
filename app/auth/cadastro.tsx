@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import  styles  from './cadastro.styles';
+import config from '../../config';
 
 export default function Cadastro() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function Cadastro() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/v1/tutor', {
+      const response = await fetch(`${config.API_URL}/tutor`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

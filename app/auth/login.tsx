@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Image, Dimensions, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import  styles  from './login.styles';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config';
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-
+  const API_URL = 'http://192.168.0.4:3000/v1';
+  
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/v1/login/tutor', {
+      const response = await axios.post(`${config.API_URL}/login/tutor`, {
         email,
         senha,
       });
@@ -63,6 +65,7 @@ export default function Login() {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -70,6 +73,7 @@ export default function Login() {
         value={senha}
         onChangeText={setSenha}
         secureTextEntry
+        autoCapitalize="none"
       />
       <View style={styles.forgotPasswordContainer}>
       <TouchableOpacity onPress={() => router.push('/auth/cadastro')}>

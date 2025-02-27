@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import CadastroPet from './CadastroPet'; 
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config';
 
 export default function GerenciarPets() {
   const insets = useSafeAreaInsets();
@@ -35,7 +36,7 @@ export default function GerenciarPets() {
         Alert.alert('Erro', 'Usuário não autenticado.');
         return;
       }
-      const response = await axios.get(`http://localhost:3000/v1/pet/tutor/${userId}`);
+      const response = await axios.get(`${config.API_URL}/pet/tutor/${userId}`);
       setPets(response.data);
     } catch (error) {
       console.error('Erro ao buscar pets:', error);
@@ -125,18 +126,28 @@ const styles = StyleSheet.create({
   petCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    padding: 18, // Aumentar o padding
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#e0e0e0', // Cor da borda mais suave
+    backgroundColor: 'white', // Fundo branco para melhor contraste
+    borderRadius: 10, // Bordas arredondadas
+    marginHorizontal: 10, // Adicionar margem horizontal
+    marginVertical: 5, // Adicionar margem vertical
+    shadowColor: '#000', // Adicionar sombra para profundidade
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   petImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 15,
+    width: 70, // Aumentar o tamanho da imagem
+    height: 70,
+    borderRadius: 35, // Tornar circular
+    marginRight: 18, // Aumentar a margem
   },
   petNome: {
-    fontSize: 16,
+    fontSize: 18, // Aumentar o tamanho da fonte
+    color: '#333',
   },
   centeredView: {
     flex: 1,

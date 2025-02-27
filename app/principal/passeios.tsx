@@ -1,30 +1,65 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+
 
 export default function Passeios() {
   const insets = useSafeAreaInsets();
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [passeadores, setPasseadores] = useState([
+    { id: '1', latitude: -23.5505, longitude: -46.6333, nome: 'Passeador 1' },
+    { id: '2', latitude: -23.5605, longitude: -46.6433, nome: 'Passeador 2' },
+  ]);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permissão para acessar a localização foi negada');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+  let text = 'Esperando localização...';
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content}>
         <Text style={styles.title}>Meus Passeios</Text>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Próximo Passeio</Text>
-          {/* <Image style={styles.petImage} source={require('../../assets/images/cao-login.jpg')} /> */}
-          <Text style={styles.cardText}>[Data e Hora]</Text>
-          <Text style={styles.cardText}>[Nome do Passeador]</Text>
-          <Text style={styles.cardText}>[Nome do Pet]</Text>
-          <Text style={styles.cardText}>[Local do Passeio]</Text>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton}>
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+       {location && (
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          >
+            <Marker coordinate={location.coords} title="Minha Localização" />
+            {passeadores.map((passeador) => (
+              <Marker
+                key={passeador.id}
+                coordinate={{ latitude: passeador.latitude, longitude: passeador.longitude }}
+                title={passeador.nome}
+              />
+            ))}
+          </MapView>
+        )}
 
-        {/* Adicione mais cards de passeios aqui */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -146,5 +181,10 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  map: {
+    width: Dimensions.get('window').width - 40,
+    height: 300,
+    marginBottom: 20,
   },
 });
