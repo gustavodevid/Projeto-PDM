@@ -1,17 +1,48 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import  styles  from './login.styles';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
-  const handleLogin = () => {
-    // Lógica de autenticação aqui
-    console.log('Login:', email, senha);
-    router.push('/principal/home');
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/v1/login/tutor', {
+        email,
+        senha,
+      });
+
+      if (response.data.token) {
+        const { token, userId, userName } = response.data;
+        console.log('Login bem-sucedido:', response.data);
+
+        await storeData('token', token);
+        await storeData('userId', String(userId));
+        await storeData('userName', userName);
+
+        router.push('/principal/home');
+      } else {
+        Alert.alert('Erro', 'Login falhou. Verifique suas credenciais.');
+      }
+    } catch (error) {
+      console.error('Erro no login:', error);
+      Alert.alert('Erro ao conectar com o servidor.');
+    }
+  };
+
+  const storeData = async (key: string, value: string) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+      console.log(`Dados armazenados com sucesso: ${key} = ${value}`);
+    } catch (error) {
+      console.error(`Erro ao armazenar dados: ${key}`, error);
+    }
   };
 
   return (
