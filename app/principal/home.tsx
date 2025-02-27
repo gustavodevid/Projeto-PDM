@@ -1,13 +1,12 @@
 import React from 'react';
 import { Text, View, Image, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons'; // Certifique-se de instalar: npx expo install @expo/vector-icons
-import styles from './home.styles';
+import { Ionicons } from '@expo/vector-icons'; 
+import styles from '../styles/home.styles';
 
 export default function Home() {
   const insets = useSafeAreaInsets();
 
-  // Dados de exemplo
   const passeadores = [
     { id: '1', nome: 'João', avaliacao: '4.8', distancia: '1.2 km', imagem: require('../../assets/images/cao-login.jpg') },
     { id: '2', nome: 'Maria', avaliacao: '4.5', distancia: '2.5 km', imagem: require('../../assets/images/cao-login.jpg') },

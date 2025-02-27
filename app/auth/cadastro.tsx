@@ -27,7 +27,7 @@ export default function Cadastro() {
 
       if (response.ok) {
         Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-        router.push('/principal/home');
+        router.push('/auth/login');
       } else {
         const errorData = await response.json();
         Alert.alert('Erro', errorData.message || 'Erro ao cadastrar.');
