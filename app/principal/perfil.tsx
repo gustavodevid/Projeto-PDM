@@ -1,33 +1,52 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, FlatList, Modal, Alert } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons'; // Certifique-se de instalar: npx expo install @expo/vector-icons
-import { useRouter, useFocusEffect } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import CadastroPet from '../pet/CadastroPet';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function Perfil() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [modalVisible, setModalVisible] = useState(false); // Estado para controlar a exibição do modal
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const storedUserName = await AsyncStorage.getItem('userName');
+        const storedUserEmail = await AsyncStorage.getItem('userEmail');
+        if (storedUserName) {
+          setUserName(storedUserName);
+        }
+        if (storedUserEmail) {
+          setUserEmail(storedUserEmail);
+        }
+      } catch (error) {
+        console.error('Erro ao recuperar o nome do usuário:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
   const handleEditarPerfil = () => {
     router.push('/configuracoes/editarPerfil');
   };
-  // Dados de exemplo (substitua pelos seus dados reais)
-  const pets = [
-    { id: '1', nome: 'Rex', imagem: require('../../assets/images/cao-login.jpg') },
-    { id: '2', nome: 'Luna', imagem: require('../../assets/images/cao-login.jpg') },
-  ];
+
+  const handleGerenciarPets = () => {
+    router.push('/pet/GerenciarPets');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.profileHeader}>
           <Image style={styles.profileImage} source={require('../../assets/images/cao-login.jpg')} />
-          <Text style={styles.profileName}>[Nome do Usuário]</Text>
-          <Text style={styles.profileEmail}>[email@exemplo.com]</Text>
-          <Text style={styles.profileInfo}>Número de Pets: {pets.length}</Text>
-          <Text style={styles.profileInfo}>[Número de Telefone]</Text>
-          <Text style={styles.profileInfo}>[Endereço]</Text>
-          <Text style={styles.profileBio}>[Biografia do Usuário]</Text>
+          <Text style={styles.profileName}>{userName || '[Nome do Usuário]'}</Text>
+          <Text style={styles.profileEmail}>{userEmail || '[Nome do Usuário]'}</Text>
         </View>
 
         <View style={styles.profileContent}>
@@ -41,7 +60,7 @@ export default function Perfil() {
             <Text style={styles.profileOptionText}>Configurações</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.profileOption}>
+          <TouchableOpacity style={styles.profileOption} onPress={handleGerenciarPets}>
             <Ionicons name="paw-outline" size={24} color="#007AFF" style={styles.optionIcon} />
             <Text style={styles.profileOptionText}>Gerenciar Pets</Text>
           </TouchableOpacity>
@@ -61,21 +80,7 @@ export default function Perfil() {
             <Text style={styles.profileOptionText}>Sair</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.petsSection}>
-          <Text style={styles.petsTitle}>Meus Pets</Text>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={pets}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.petCard}>
-                <Image style={styles.petImage} source={item.imagem} />
-                <Text style={styles.petNome}>{item.nome}</Text>
-              </View>
-            )}
-          />
-        </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -162,5 +167,39 @@ const styles = StyleSheet.create({
   },
   petNome: {
     fontSize: 14,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '90%',
+  },
+  closeButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 15,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

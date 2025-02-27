@@ -19,12 +19,14 @@ export default function Login() {
       });
 
       if (response.data.token) {
-        const { token, userId, userName } = response.data;
+        console.log(response.data)
+        const { token, userName, userEmail, userId } = response.data;
         console.log('Login bem-sucedido:', response.data);
 
         await storeData('token', token);
-        await storeData('userId', String(userId));
         await storeData('userName', userName);
+        await storeData('userEmail', userEmail);
+        await storeData('userId', userId);
 
         router.push('/principal/home');
       } else {
