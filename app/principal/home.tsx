@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Image, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons'; // Certifique-se de instalar: npx expo install @expo/vector-icons
+import styles from './home.styles';
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -38,20 +39,6 @@ export default function Home() {
 
       <ScrollView style={styles.content}>
 
-        <View style={styles.widget}>
-          <Text style={styles.widgetTitle}>Lembretes</Text>
-          <FlatList
-            data={lembretes}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.lembreteItem}>
-                <Text style={styles.lembreteTarefa}>{item.tarefa}</Text>
-                <Text style={styles.lembreteDetalhe}>Pet: {item.pet}</Text>
-                <Text style={styles.lembreteDetalhe}>Data: {item.data}</Text>
-              </View>
-            )}
-          />
-        </View>
         {/* Feed de Atividades */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Atividades Recentes</Text>
@@ -109,200 +96,14 @@ export default function Home() {
             )}
           />
         </View>
-        {/* Widget de Previsão do Tempo */}
+        {/* Widget de Previsão do Tempo
         <View style={styles.weatherWidget}>
           <Ionicons name="partly-sunny-outline" size={32} color="#FF9800" />
           <Text style={styles.weatherTemp}>35°C</Text>
           <Text style={styles.weatherText}>Ensolarado</Text>
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    justifyContent: 'space-between',
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  userName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    flex: 1,
-    marginLeft: 10,
-  },
-  notificationIcon: {
-    padding: 8,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  cardText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  cardButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  cardButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  passeadorCard: {
-    marginRight: 10,
-    alignItems: 'center',
-  },
-  passeadorImagem: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 5,
-  },
-  passeadorNome: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  passeadorAvaliacao: {
-    fontSize: 14,
-    color: 'gray',
-  },
-  passeadorDistancia: {
-    fontSize: 14,
-    color: 'gray',
-  },
-  verTodosButton: {
-    marginTop: 10,
-    alignSelf: 'flex-end',
-  },
-  verTodosText: {
-    color: '#007AFF',
-  },
-  weatherWidget: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  weatherTemp: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  weatherText: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  atividadeCard: {
-    marginRight: 10,
-    alignItems: 'center',
-  },
-  atividadeImagem: {
-    width: 100,
-    height: 80,
-    borderRadius: 8,
-    marginBottom: 5,
-  },
-  atividadeTipo: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  atividadeDetalhe: {
-    fontSize: 12,
-    color: 'gray',
-  },
-  dicaCard: {
-    marginRight: 10,
-    alignItems: 'center',
-  },
-  dicaImagem: {
-    width: 120,
-    height: 80,
-    borderRadius: 8,
-    marginBottom: 5,
-  },
-  dicaTitulo: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  widget: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  widgetTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  lembreteItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  lembreteTarefa: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  lembreteDetalhe: {
-    fontSize: 14,
-    color: 'gray',
-  },
-});

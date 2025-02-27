@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import  styles  from './cadastro.styles';
 
@@ -10,11 +10,34 @@ export default function Cadastro() {
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
 
-  const handleCadastro = () => {
-    // Lógica de cadastro aqui
-    console.log('Cadastro:', nome, email, senha, confirmarSenha);
-    // Exemplo: router.push('/home');
+  const handleCadastro = async () => {
+    if (senha !== confirmarSenha) {
+      Alert.alert('Erro', 'As senhas não coincidem.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/v1/tutor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nome, email, senha }),
+      });
+
+      if (response.ok) {
+        Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+        router.push('/principal/home');
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Erro', errorData.message || 'Erro ao cadastrar.');
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar:', error);
+      Alert.alert('Erro', 'Erro ao conectar com o servidor.');
+    }
   };
+
 
   return (
     <View style={styles.container}>
