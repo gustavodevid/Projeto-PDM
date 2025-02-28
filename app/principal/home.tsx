@@ -38,11 +38,6 @@ export default function Home() {
     fetchPasseadores();
   }, []);
 
-  // const passeadores = [
-  //   { id: '1', nome: 'João', avaliacao: '4.8', distancia: '1.2 km', imagem: require('../../assets/images/cao-login.jpg') },
-  //   { id: '2', nome: 'Maria', avaliacao: '4.5', distancia: '2.5 km', imagem: require('../../assets/images/cao-login.jpg') },
-  // ];
-
   const dicas = [
     { id: '1', titulo: 'Treinando seu pet', imagem: require('../../assets/images/cao-login.jpg') },
     { id: '2', titulo: 'Cuidados com a saúde', imagem: require('../../assets/images/cao-login.jpg') },

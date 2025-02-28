@@ -11,7 +11,6 @@ export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const API_URL = 'http://192.168.0.4:3000/v1';
   
   const handleLogin = async () => {
     try {

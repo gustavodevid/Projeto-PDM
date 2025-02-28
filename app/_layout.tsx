@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import AuthCheck from './components/AuthCheck';
 
 export default function RootLayout() {
   return( 
@@ -7,5 +8,6 @@ export default function RootLayout() {
     headerShown: false,
     animation: 'slide_from_right',
   }}
-/>) 
+/>
+) 
 }
