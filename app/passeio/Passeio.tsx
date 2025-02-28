@@ -215,7 +215,9 @@ const styles = StyleSheet.create({
   },
   map: {
     width: Dimensions.get('window').width - 40,
-    height: 300,
+    height: 700,
     marginBottom: 20,
-  },
+    borderRadius: 10,
+    overflow: 'hidden',
+},
 });

@@ -72,11 +72,6 @@ export default function Perfil() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.profileOption}>
-            <Ionicons name="card-outline" size={24} color="#007AFF" style={styles.optionIcon} />
-            <Text style={styles.profileOptionText}>Métodos de Pagamento</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.profileOption}>
             <Ionicons name="log-out-outline" size={24} color="#FF6347" style={styles.optionIcon} />
             <Text style={styles.profileOptionText}>Sair</Text>
           </TouchableOpacity>

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, Image, ScrollView, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { Text, View, Image, ScrollView, TouchableOpacity, FlatList, Alert, Modal } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons'; 
 import styles from '../styles/home.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import Passeio from '../passeio/Passeio';
+import { router } from 'expo-router';
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -52,6 +54,10 @@ export default function Home() {
     { id: '2', tarefa: 'Passeio', pet: 'Luna', data: '28/02/2025' },
   ];
 
+  const handleSearchPress = () => {
+    router.push('/passeio/Passeio'); // Redirecione para a página Passeios
+};
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -64,6 +70,11 @@ export default function Home() {
 
       <ScrollView style={styles.content}>
 
+       {/* Input de Busca */}
+       <TouchableOpacity style={styles.searchInput} onPress={handleSearchPress}>
+                    <Ionicons name="search-outline" size={24} color="gray" />
+                    <Text style={styles.searchText}>Buscar Passeio</Text>
+                </TouchableOpacity>
         {/* Feed de Atividades */}
         {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Atividades Recentes</Text>
@@ -92,7 +103,7 @@ export default function Home() {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={passeadores}
-            keyExtractor={(item) => item.passeadorId.toString()} // Certifique-se de que o id seja uma string
+            keyExtractor={(item) => item.passeadorId.toString()} 
             renderItem={({ item }) => (
               <View style={styles.passeadorCard}>
                 <Image style={styles.passeadorImagem} source={require('../../assets/images/cao-login.jpg')} /> 
@@ -107,6 +118,7 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
+        
     {/* Dicas e Artigos */}
     {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Dicas e Artigos</Text>
