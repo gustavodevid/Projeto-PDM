@@ -1,221 +1,108 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, Text, View, ScrollView, Alert, RefreshControl } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
 import axios from 'axios';
 import config from '../../config';
-import customMap from '../../assets/maps/customMap.json';
-import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from 'expo-router';
 
-interface Passeador {
-  passeadorId: number;
-  nome: string;
-  latitude: string; 
-  longitude: string;
+interface Servico {
+    servicoId: number;
+    passeadorId: number;
+    petId: number;
+    data: string;
+    horario: string;
+    passeador: { nome: string };
+    pet: { nome: string };
 }
 
-export default function Passeios() {
-  const insets = useSafeAreaInsets();
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+export default function MeusPasseios() {
+    const insets = useSafeAreaInsets();
+    const [servicos, setServicos] = useState<Servico[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-  // const [passeadores, setPasseadores] = useState([
-  //   { id: '1', latitude: -23.5505, longitude: -46.6333, nome: 'Passeador 1' },
-  //   { id: '2', latitude: -23.5605, longitude: -46.6433, nome: 'Passeador 2' },
-  // ]);
-
-  const [passeadores, setPasseadores] = useState<Passeador[]>([]);
-
-  useEffect(() => {
-    const fetchPasseadores = async () => {
+    const fetchServicos = useCallback(async () => {
+      setLoading(true); 
       try {
-        const response = await axios.get<Passeador[]>(`${config.API_URL}/passeador`);
-        setPasseadores(response.data);
+          const userId = await AsyncStorage.getItem('userId');
+          if (userId) {
+              const response = await axios.get<Servico[]>(`${config.API_URL}/servico/tutor/${userId}`);
+              setServicos(response.data);
+          } else {
+              Alert.alert('Erro', 'Usuário não autenticado.');
+          }
       } catch (error) {
-        console.error('Erro ao buscar passeadores:', error);
-        Alert.alert('Erro', 'Erro ao buscar passeadores.');
+          console.error('Erro ao buscar serviços:', error);
+          Alert.alert('Erro', 'Erro ao buscar serviços.');
+      } finally {
+          setLoading(false); 
       }
-    };
-
-    fetchPasseadores();
+      setRefreshing(false);
   }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchServicos();
+  }, [fetchServicos]);
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permissão para acessar a localização foi negada');
-        return;
-      }
+      fetchServicos();
+  }, [fetchServicos]);
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
+    return (
+        <SafeAreaView style={styles.container}>
+            <ScrollView style={styles.content}  refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
+                <Text style={styles.title}>Meus Passeio</Text>
 
-  let text = 'Esperando localização...';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content}>
-        <Text style={styles.title}>Buscar Passeio</Text>
-
-       {location && (
-          <MapView
-          style={styles.map}
-          customMapStyle={customMap}
-          initialRegion={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-        >
-          <Marker coordinate={location.coords} title="Minha Localização" />
-          {passeadores.map((passeador) => (
-            <Marker
-              key={passeador.passeadorId}
-              coordinate={{
-                latitude: parseFloat(passeador.latitude),
-                longitude: parseFloat(passeador.longitude),
-              }}
-              title={passeador.nome}
-            />
-          ))}
-        </MapView>
-        )}
-
-      </ScrollView>
-    </SafeAreaView>
-  );
+                {servicos.map((servico) => (
+                    <View key={servico.servicoId} style={styles.servicoCard}>
+                        <Text style={styles.servicoTitle}>Serviço #{servico.servicoId}</Text>
+                        <Text style={styles.servicoText}>Passeador: {servico.passeador.nome}</Text>
+                        <Text style={styles.servicoText}>Pet: {servico.pet.nome}</Text>
+                        <Text style={styles.servicoText}>Data: {servico.data}</Text>
+                        <Text style={styles.servicoText}>Horário: {servico.horario}</Text>
+                    </View>
+                ))}
+            </ScrollView>
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  petImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignSelf: 'center',
-    marginBottom: 10,
-  },
-  passeioCard: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  passeioTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  passeioText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  passeioButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-  },
-  passeioButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  cardText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  cardButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  cardButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  passeadorCard: {
-    marginRight: 10,
-    alignItems: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 15,
-  },
-  cancelButton: {
-    backgroundColor: '#FF6347',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  cancelButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  map: {
-    width: Dimensions.get('window').width - 40,
-    height: 300,
-    marginBottom: 20,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#f8f8f8',
+    },
+    content: {
+        flex: 1,
+        padding: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    servicoCard: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    servicoTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    servicoText: {
+        fontSize: 16,
+        marginBottom: 5,
+    },
 });

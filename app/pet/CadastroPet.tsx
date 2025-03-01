@@ -52,28 +52,28 @@ const CadastroPet: React.FC<CadastroPetProps> = ({ onPetCadastrado }) => {
 //     }
 //   };
 
-  const cadastrarPet = async () => {
-    if (!nome || !raca || !idade || !tutorId) {
-      Alert.alert('Erro', 'Preencha todos os campos.');
-      return;
-    }
+    const cadastrarPet = async () => {
+      if (!nome || !raca || !idade || !tutorId) {
+        Alert.alert('Erro', 'Preencha todos os campos.');
+        return;
+      }
 
-    try {
-      const response = await axios.post(`${config.API_URL}/pet`, {
-        nome,
-        raca,
-        idade: parseInt(idade),
-        tutorId: tutorId,
-      });
+      try {
+        const response = await axios.post(`${config.API_URL}/pet`, {
+          nome,
+          raca,
+          idade: parseInt(idade),
+          tutorId: tutorId,
+        });
 
-      console.log('Pet cadastrado com sucesso:', response.data);
-      Alert.alert('Sucesso', 'Pet cadastrado com sucesso!');
-      onPetCadastrado(); 
-    } catch (error) {
-      console.error('Erro ao cadastrar pet:', error);
-      Alert.alert('Erro', 'Erro ao cadastrar pet. Tente novamente.');
-    }
-  };
+        console.log('Pet cadastrado com sucesso:', response.data);
+        Alert.alert('Sucesso', 'Pet cadastrado com sucesso!');
+        onPetCadastrado(); 
+      } catch (error) {
+        console.error('Erro ao cadastrar pet:', error);
+        Alert.alert('Erro', 'Erro ao cadastrar pet. Tente novamente.');
+      }
+    };
 
   return (
     <View style={styles.container}>
