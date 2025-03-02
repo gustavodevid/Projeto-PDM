@@ -5,12 +5,11 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ScrollView,
   FlatList,
   Modal,
   Alert,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CadastroPet from './CadastroPet'; 
 import axios from 'axios';
@@ -27,7 +26,6 @@ interface Pet {
 }
 
 export default function GerenciarPets() {
-  const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,12 +78,23 @@ export default function GerenciarPets() {
         <FlatList
           data={pets}
           keyExtractor={(pet) => pet.petId}
-          renderItem={({ item: pet }) => (
-            <View style={styles.petCard}>
-              <Image style={styles.petImage} source={pet.foto || require('../../assets/images/cao-login.jpg')} />
-              <Text style={styles.petNome}>{pet.nome}</Text>
-            </View>
-          )}
+          renderItem={({ item: pet }) => {
+            const fotoUri = pet.foto?.trim();
+            console.log(`Carregando imagem do pet ${pet.nome}:`, fotoUri);
+            
+            return (
+              <View style={styles.petCard}>
+                <Image
+                  style={styles.petImage}
+                  source={
+                    fotoUri ? { uri: fotoUri } : require('../../assets/images/cao-login.jpg')
+                  }
+                  onError={(error) => console.log(`Erro ao carregar imagem ${pet.nome}:`, error.nativeEvent)}
+                />
+                <Text style={styles.petNome}>{pet.nome}</Text>
+              </View>
+            );
+          }}
         />
 
         <Modal
@@ -133,27 +142,27 @@ const styles = StyleSheet.create({
   petCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 18, // Aumentar o padding
+    padding: 18,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0', // Cor da borda mais suave
-    backgroundColor: 'white', // Fundo branco para melhor contraste
-    borderRadius: 10, // Bordas arredondadas
-    marginHorizontal: 10, // Adicionar margem horizontal
-    marginVertical: 5, // Adicionar margem vertical
-    shadowColor: '#000', // Adicionar sombra para profundidade
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
   },
   petImage: {
-    width: 70, // Aumentar o tamanho da imagem
+    width: 70,
     height: 70,
-    borderRadius: 35, // Tornar circular
-    marginRight: 18, // Aumentar a margem
+    borderRadius: 35,
+    marginRight: 18,
   },
   petNome: {
-    fontSize: 18, // Aumentar o tamanho da fonte
+    fontSize: 18,
     color: '#333',
   },
   centeredView: {

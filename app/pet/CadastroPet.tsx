@@ -44,7 +44,6 @@ const CadastroPet: React.FC<CadastroPetProps> = ({ onPetCadastrado }) => {
     let resultado = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
 
@@ -65,11 +64,14 @@ const CadastroPet: React.FC<CadastroPetProps> = ({ onPetCadastrado }) => {
         formData.append('raca', raca);
         formData.append('idade', parseInt(idade));
         formData.append('tutorId', tutorId);
-        formData.append('foto', {
-            uri: `data:image/jpeg;base64,${foto}`,
+        
+        if (foto) {
+          formData.append('foto', {
+            uri: foto,
             type: 'image/jpeg',
-            name: 'pet_photo.jpg',
-        });
+            name: `pet-${Date.now()}.jpg`,
+          });
+        }
 
         const response = await axios.post(`${config.API_URL}/pet`, formData, {
             headers: {
