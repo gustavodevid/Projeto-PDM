@@ -236,6 +236,9 @@ export default function Passeios() {
             <Modal visible={showPetModal} animationType="slide" transparent={true}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
+                    <TouchableOpacity style={styles.closeButton} onPress={() => setShowPetModal(false)}>
+                        <Text style={styles.closeButtonText}>Fechar</Text>
+                    </TouchableOpacity>
                         {pets.map((pet) => (
                             <TouchableOpacity key={pet.petId} style={styles.petItem} onPress={() => {
                                 setSelectedPet(pet);
@@ -425,5 +428,13 @@ petItem: {
   padding: 10,
   borderBottomWidth: 1,
   borderBottomColor: '#eee',
+},
+closeButton: {
+  alignSelf: 'flex-end',
+  padding: 10,
+},
+closeButtonText: {
+  color: 'blue',
+  fontWeight: 'bold',
 },
 });

@@ -12,6 +12,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
+import FormData from 'form-data';
 
 interface CadastroPetProps {
   onPetCadastrado: () => void; 
@@ -39,41 +40,51 @@ const CadastroPet: React.FC<CadastroPetProps> = ({ onPetCadastrado }) => {
     fetchTutorId();
   }, []);
 
-//   const escolherFoto = async () => {
-//     let resultado = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: true,
-//       aspect: [4, 3],
-//       quality: 1,
-//     });
+  const escolherFoto = async () => {
+    let resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-//     if (!resultado.canceled) {
-//       setFoto(resultado.assets[0].uri);
-//     }
-//   };
+    if (!resultado.canceled) {
+      setFoto(resultado.assets[0].uri);
+    }
+  };
 
-    const cadastrarPet = async () => {
-      if (!nome || !raca || !idade || !tutorId) {
+  const cadastrarPet = async () => {
+    if (!nome || !raca || !foto || !idade || !tutorId) {
         Alert.alert('Erro', 'Preencha todos os campos.');
         return;
-      }
+    }
 
-      try {
-        const response = await axios.post(`${config.API_URL}/pet`, {
-          nome,
-          raca,
-          idade: parseInt(idade),
-          tutorId: tutorId,
+    try {
+        const formData = new FormData();
+        formData.append('nome', nome);
+        formData.append('raca', raca);
+        formData.append('idade', parseInt(idade));
+        formData.append('tutorId', tutorId);
+        formData.append('foto', {
+            uri: `data:image/jpeg;base64,${foto}`,
+            type: 'image/jpeg',
+            name: 'pet_photo.jpg',
+        });
+
+        const response = await axios.post(`${config.API_URL}/pet`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
 
         console.log('Pet cadastrado com sucesso:', response.data);
         Alert.alert('Sucesso', 'Pet cadastrado com sucesso!');
-        onPetCadastrado(); 
-      } catch (error) {
+        onPetCadastrado();
+    } catch (error) {
         console.error('Erro ao cadastrar pet:', error);
         Alert.alert('Erro', 'Erro ao cadastrar pet. Tente novamente.');
-      }
-    };
+    }
+};
 
   return (
     <View style={styles.container}>
@@ -93,9 +104,9 @@ const CadastroPet: React.FC<CadastroPetProps> = ({ onPetCadastrado }) => {
         onChangeText={setRaca}
       />
 
-      {/* <TouchableOpacity style={styles.imagePicker} onPress={escolherFoto}>
+      <TouchableOpacity style={styles.imagePicker} onPress={escolherFoto}>
         <Text style={styles.imagePickerText}>Selecionar Foto</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
 
       {foto && <Image source={{ uri: foto }} style={styles.imagePreview} />}
 

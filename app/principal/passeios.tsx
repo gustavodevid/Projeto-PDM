@@ -55,7 +55,7 @@ export default function MeusPasseios() {
             <ScrollView style={styles.content}  refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }>
-                <Text style={styles.title}>Meus Passeio</Text>
+                <Text style={styles.title}>Meus Passeios</Text>
 
                 {servicos.map((servico) => (
                     <View key={servico.servicoId} style={styles.servicoCard}>

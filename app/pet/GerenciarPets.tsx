@@ -17,10 +17,19 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 
+interface Pet {
+  petId: string;
+  nome: string;
+  raca: string;
+  idade: number;
+  tutorId: string;
+  foto?: string | null;
+}
+
 export default function GerenciarPets() {
   const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
-  const [pets, setPets] = useState([]);
+  const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,7 +70,6 @@ export default function GerenciarPets() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
         <View style={styles.petsHeader}>
           <Text style={styles.petsTitle}>Meus Pets</Text>
           <TouchableOpacity style={styles.addPetButton} onPress={() => setModalVisible(true)}>
@@ -71,11 +79,11 @@ export default function GerenciarPets() {
 
         <FlatList
           data={pets}
-          keyExtractor={(item) => item.petId}
-          renderItem={({ item }) => (
+          keyExtractor={(pet) => pet.petId}
+          renderItem={({ item: pet }) => (
             <View style={styles.petCard}>
-              <Image style={styles.petImage} source={item.imagem || require('../../assets/images/cao-login.jpg')} />
-              <Text style={styles.petNome}>{item.nome}</Text>
+              <Image style={styles.petImage} source={pet.foto || require('../../assets/images/cao-login.jpg')} />
+              <Text style={styles.petNome}>{pet.nome}</Text>
             </View>
           )}
         />
@@ -98,7 +106,6 @@ export default function GerenciarPets() {
             </View>
           </View>
         </Modal>
-      </ScrollView>
     </SafeAreaView>
   );
 }
