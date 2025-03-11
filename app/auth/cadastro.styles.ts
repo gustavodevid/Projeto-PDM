@@ -68,6 +68,26 @@ const styles = StyleSheet.create({
         color: 'blue',
         fontSize: 16,
       },
+      imagePicker: {
+        backgroundColor: '#e6f7ff',
+        padding: 15,
+        alignItems: 'center',
+        marginBottom: 15,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#b3e0ff',
+    },
+    imagePickerText: {
+        fontSize: 16,
+        color: '#007bff',
+    },
+    imagePreview: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        marginBottom: 20,
+        alignSelf: 'center',
+    },
     });
 
     export default styles;

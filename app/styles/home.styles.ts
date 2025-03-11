@@ -231,6 +231,11 @@ const styles = StyleSheet.create({
       marginLeft: 10,
       color: 'gray',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+},
   });
 
   export default styles;

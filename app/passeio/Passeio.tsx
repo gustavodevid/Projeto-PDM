@@ -18,26 +18,32 @@ import axios from 'axios';
 import config from '../../config';
 import customMap from '../../assets/maps/customMap.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Geometry } from 'geojson';
+
 
 interface Passeador {
-    passeadorId: number;
+    passeadorId: string;
     nome: string;
     latitude: string;
     longitude: string;
 }
 
 interface Pet {
-  petId: number;
+  petId: string;
   nome: string;
   raca: string;
 }
 
 interface Servico {
-  passeadorId: number;
-  petId: number;
+  passeadorId: string;
+  petId: string;
   tutorId: string;
-  data: string; // Formato: "AAAA-MM-DD"
-  horario: string; // Formato: "HH:MM"
+  dataServico: Date;
+  localizacaoServico: Geometry;
+  tipoServico: 'passeio'
+
 }
 
 export default function Passeios() {
@@ -48,10 +54,13 @@ export default function Passeios() {
     const [pets, setPets] = useState<Pet[]>([]);
     const [selectedPasseador, setSelectedPasseador] = useState<Passeador | null>(null);
     const [selectedPet, setSelectedPet] = useState<Pet | null>(null); 
-    const [selectedTime, setSelectedTime] = useState<string>('');
-    const [selectedDate, setSelectedDate] = useState<string>('');
+    const [selectedTime, setSelectedTime] = useState<Date>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [loading, setLoading] = useState(true);
     const [showPetModal, setShowPetModal] = useState<boolean>(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTimePicker, setShowTimePicker] = useState(false);
+    const [date, setDate] = useState(new Date());
 
     useEffect(() => {
         const fetchPasseadores = async () => {
@@ -98,8 +107,12 @@ export default function Passeios() {
                 passeadorId: selectedPasseador.passeadorId,
                 petId: selectedPet.petId,
                 tutorId: userId, 
-                data: selectedDate,
-                horario: selectedTime,
+                dataServico: selectedDate,
+                localizacaoServico: {
+                  type: 'Point',
+                  coordinates: [location.coords.longitude, location.coords.latitude],
+              },
+              tipoServico: 'passeio',
             };
             
             Alert.alert(
@@ -125,7 +138,7 @@ export default function Passeios() {
     };
   
     const cadastrarServicoPasseio = async (servico: Servico, onServicoCadastrado: () => void) => {
-      if (!servico.passeadorId || !servico.tutorId || !servico.petId || !servico.data || !servico.horario) {
+      if (!servico.passeadorId || !servico.tutorId || !servico.petId || !servico.dataServico) {
         Alert.alert('Erro', 'Preencha todos os campos.');
         return;
       }
@@ -135,6 +148,7 @@ export default function Passeios() {
     
         console.log('Serviço de passeio cadastrado com sucesso:', response.data);
         Alert.alert('Sucesso', 'Serviço de passeio cadastrado com sucesso!');
+        router.push('/principal/passeios');
         onServicoCadastrado(); 
       } catch (error) {
         console.error('Erro ao cadastrar serviço de passeio:', error);
@@ -160,6 +174,15 @@ export default function Passeios() {
         setLoading(false);
       }
     };
+
+    const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+      if (selectedDate) {
+          setDate(selectedDate);
+          setSelectedDate(selectedDate);
+          setShowDatePicker(false);
+      }
+  };
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -206,19 +229,23 @@ export default function Passeios() {
                                     <Text>{selectedPet ? selectedPet.nome : 'Selecione o Pet'}</Text>
                                 </TouchableOpacity>
 
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Horário (HH:MM)"
-                                    value={selectedTime}
-                                    onChangeText={setSelectedTime}
-                                />
+                               <TouchableOpacity style={styles.input} onPress={() => setShowTimePicker(true)}>
+                </TouchableOpacity>
 
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Data (AAAA-MM-DD)"
-                                    value={selectedDate}
-                                    onChangeText={setSelectedDate}
-                                />
+                <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
+    <Text>{selectedDate ? selectedDate.toLocaleDateString() : 'Selecione a Data'}</Text>
+</TouchableOpacity>
+
+                {showDatePicker && (
+                    <DateTimePicker
+                        testID="dateTimePicker"
+                        value={date}
+                        mode="date"
+                        is24Hour={true}
+                        display="default"
+                        onChange={handleDateChange}
+                    />
+                )}
 
                                 <TouchableOpacity style={styles.modalButton} onPress={handleProporPasseio}>
                                     <Text style={styles.modalButtonText}>Propor Passeio</Text>

@@ -8,6 +8,7 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
+    ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,18 +17,22 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import SignUpButton from '../components/SignUpButton';
+import LoginButton from '../components/LoginButton';
+import  loginTutor  from '../services/apis/auth/LoginTutor';
+import { storeData } from '../utils/Storage/StoreData';
 
 export default function Login() {
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
+        setLoading(true);
         try {
-            const response = await axios.post(`${config.API_URL}/login/tutor`, {
-                email,
-                senha,
-            });
+            const response = await loginTutor(email, senha);
 
             if (response.data.token) {
                 const { token, userName, userEmail, userId } = response.data;
@@ -42,14 +47,8 @@ export default function Login() {
         } catch (error) {
             console.error('Erro no login:', error);
             Alert.alert('Erro ao conectar com o servidor.');
-        }
-    };
-
-    const storeData = async (key: string, value: string) => {
-        try {
-            await AsyncStorage.setItem(key, value);
-        } catch (error) {
-            console.error(`Erro ao armazenar dados: ${key}`, error);
+        }  finally {
+            setLoading(false);
         }
     };
 
@@ -58,7 +57,7 @@ export default function Login() {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardAvoidingView}
-            >
+                >
                 <View style={styles.imageContainer}>
                     <Image style={styles.logo} source={require('../../assets/images/cao-login.jpg')} />
                 </View>
@@ -73,7 +72,7 @@ export default function Login() {
                             onChangeText={setEmail}
                             keyboardType="email-address"
                             autoCapitalize="none"
-                        />
+                            />
                     </View>
                     <View style={styles.inputContainer}>
                         <MaterialCommunityIcons name="lock-outline" size={24} color="#888" style={styles.inputIcon} />
@@ -84,14 +83,13 @@ export default function Login() {
                             onChangeText={setSenha}
                             secureTextEntry
                             autoCapitalize="none"
-                        />
+                            />
                     </View>
-                    <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                        <Text style={styles.buttonText}>Entrar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => router.push('/auth/cadastro')}>
-                        <Text style={styles.signupLink}>Crie sua conta</Text>
-                    </TouchableOpacity>
+
+                    <LoginButton onPress={handleLogin} loading={loading}  />
+
+                    <SignUpButton title="Crie sua conta" onPress={() => router.push('/auth/cadastro')} />
+                
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>

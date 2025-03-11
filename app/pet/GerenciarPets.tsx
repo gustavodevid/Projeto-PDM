@@ -15,6 +15,7 @@ import CadastroPet from './CadastroPet';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
+import getFullImagePath from '../utils/utils';
 
 interface Pet {
   petId: string;
@@ -86,8 +87,7 @@ export default function GerenciarPets() {
               <View style={styles.petCard}>
                 <Image
                   style={styles.petImage}
-                  source={
-                    fotoUri ? { uri: fotoUri } : require('../../assets/images/cao-login.jpg')
+                  source={fotoUri ? { uri: getFullImagePath(fotoUri) } : require('../../assets/images/cao-login.jpg')
                   }
                   onError={(error) => console.log(`Erro ao carregar imagem ${pet.nome}:`, error.nativeEvent)}
                 />
@@ -122,7 +122,7 @@ export default function GerenciarPets() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#fff',
   },
   petsHeader: {
     flexDirection: 'row',

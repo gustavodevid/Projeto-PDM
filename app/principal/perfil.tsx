@@ -7,6 +7,7 @@ import CadastroPet from '../pet/CadastroPet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import getFullImagePath from '../utils/utils';
 
 export default function Perfil() {
   const router = useRouter();
@@ -14,18 +15,23 @@ export default function Perfil() {
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar a exibição do modal
   const [userName, setUserName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [fotoUri, setFotoUri] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const storedUserName = await AsyncStorage.getItem('userName');
         const storedUserEmail = await AsyncStorage.getItem('userEmail');
+        const storedUserId = await AsyncStorage.getItem('userId');
         if (storedUserName) {
           setUserName(storedUserName);
         }
         if (storedUserEmail) {
           setUserEmail(storedUserEmail);
         }
+        if (storedUserId) {
+          await fetchUserPhoto(storedUserId); 
+      }
       } catch (error) {
         console.error('Erro ao recuperar o nome do usuário:', error);
       }
@@ -33,6 +39,18 @@ export default function Perfil() {
 
     fetchUserData();
   }, []);
+
+  const fetchUserPhoto = async (userId: string) => {
+    try {
+        const response = await axios.get(`${config.API_URL}/tutor/${userId}`);
+        if (response.data && response.data.foto) {
+            setFotoUri(response.data.foto);
+        }
+    } catch (error) {
+        console.error('Erro ao buscar foto do usuário:', error);
+    }
+};
+
   const handleEditarPerfil = () => {
     router.push('/configuracoes/editarPerfil');
   };
@@ -41,25 +59,37 @@ export default function Perfil() {
     router.push('/pet/GerenciarPets');
   };
 
+  const handleLogout = async () => {
+    try {
+        await AsyncStorage.removeItem('userId');
+        await AsyncStorage.removeItem('userName');
+        await AsyncStorage.removeItem('userEmail');
+        await AsyncStorage.removeItem('token');
+        router.push('/auth/login');
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        Alert.alert('Erro', 'Erro ao fazer logout. Tente novamente.');
+    }
+};
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.profileHeader}>
-          <Image style={styles.profileImage} source={require('../../assets/images/cao-login.jpg')} />
+          <TouchableOpacity onPress={handleEditarPerfil}>  
+            <Image style={styles.profileImage} source={fotoUri ? { uri: getFullImagePath(fotoUri) } : require('../../assets/images/cao-login.jpg')
+                  } />
+          </TouchableOpacity>
           <Text style={styles.profileName}>{userName || '[Nome do Usuário]'}</Text>
           <Text style={styles.profileEmail}>{userEmail || '[Nome do Usuário]'}</Text>
         </View>
 
         <View style={styles.profileContent}>
-          <TouchableOpacity style={styles.profileOption} onPress={handleEditarPerfil}>
-            <Ionicons name="person-outline" size={24} color="#007AFF" style={styles.optionIcon} />
-            <Text style={styles.profileOptionText}>Editar Perfil</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.profileOption}>
+          {/* <TouchableOpacity style={styles.profileOption}>
             <Ionicons name="settings-outline" size={24} color="#007AFF" style={styles.optionIcon} />
             <Text style={styles.profileOptionText}>Configurações</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity style={styles.profileOption} onPress={handleGerenciarPets}>
             <Ionicons name="paw-outline" size={24} color="#007AFF" style={styles.optionIcon} />
@@ -71,9 +101,9 @@ export default function Perfil() {
             <Text style={styles.profileOptionText}>Histórico de Passeios</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.profileOption}>
-            <Ionicons name="log-out-outline" size={24} color="#FF6347" style={styles.optionIcon} />
-            <Text style={styles.profileOptionText}>Sair</Text>
+          <TouchableOpacity style={styles.profileOption} onPress={handleLogout}>
+                        <Ionicons name="log-out-outline" size={24} color="#FF6347" style={styles.optionIcon} />
+                        <Text style={styles.profileOptionText}>Sair</Text>
           </TouchableOpacity>
         </View>
 
@@ -85,7 +115,7 @@ export default function Perfil() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#fff',
   },
   profileHeader: {
     alignItems: 'center',

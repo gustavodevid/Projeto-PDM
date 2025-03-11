@@ -1,80 +1,98 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { launchImageLibrary, MediaType } from 'react-native-image-picker';
+import axios from 'axios';
+import FormData from 'form-data';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config';
+import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 
 export default function EditarPerfil() {
-  const insets = useSafeAreaInsets();
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [telefone, setTelefone] = useState('');
+    const insets = useSafeAreaInsets();
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
-  const handleImagePicker = () => {
-    const options = {
-      mediaType: 'photo' as MediaType,
-      includeBase64: false,
-      maxHeight: 2000,
-      maxWidth: 2000,
-    };
+    useEffect(() => {
+      const fetchUserId = async () => {
+          try {
+              const storedUserId = await AsyncStorage.getItem('userId');
+              if (storedUserId) {
+                  setUserId(storedUserId);
+              }
+          } catch (error) {
+              console.error('Erro ao recuperar o ID do usuário:', error);
+          }
+      };
 
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.assets && response.assets.length > 0) {
-        const imageUri = response.assets[0]?.uri;
-        setProfileImage(imageUri || null);
-      } else if (response.errorMessage) {
-        console.log('ImagePicker Error: ', response.errorMessage);
-      } else {
-        console.log('Unknown image picker error');
+      fetchUserId();
+  }, []);
+
+  const escolherFoto = async () => {
+      let resultado = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          quality: 1,
+      });
+
+      if (!resultado.canceled) {
+          setProfileImage(resultado.assets[0].uri);
       }
-    });
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.profileHeader}>
-        <TouchableOpacity onPress={handleImagePicker}>
-          <Image style={styles.profileImage} source={profileImage ? { uri: profileImage } : require('../../assets/images/cao-login.jpg')} />
-        </TouchableOpacity>
-        <Text style={styles.profileName}>Editar Perfil</Text>
-      </View>
+  const atualizarFoto = async () => {
+      if (!profileImage || !userId) {
+          Alert.alert('Erro', 'Selecione uma foto e verifique se o usuário está autenticado.');
+          return;
+      }
 
-      <View style={styles.profileContent}>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome"
-          value={nome}
-          onChangeText={setNome}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Telefone"
-          value={telefone}
-          onChangeText={setTelefone}
-          keyboardType="phone-pad"
-        />
+      try {
+          const formData = new FormData();
+          formData.append('foto', {
+              uri: profileImage,
+              type: 'image/jpeg',
+              name: `profile-${Date.now()}.jpg`,
+          });
+          const response = await axios.put(`${config.API_URL}/tutor/${userId}`, formData, {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+              },
+          });
 
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>Salvar Alterações</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
+          console.log('Foto atualizada com sucesso:', response.data);
+          Alert.alert('Sucesso', 'Foto atualizada com sucesso!');
+          router.push('/principal/perfil')
+      } catch (error) {
+          if (axios.isAxiosError(error)) {
+            console.log('Axios Error Response:', error.response); 
+        }
+          Alert.alert('Erro', 'Erro ao atualizar foto. Tente novamente.');
+      }
+  };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={styles.profileHeader}>
+                <TouchableOpacity onPress={escolherFoto}>
+                    <Image style={styles.profileImage} source={profileImage ? { uri: profileImage } : require('../../assets/images/cao-login.jpg')} />
+                </TouchableOpacity>
+                <Text style={styles.profileName}>Editar Foto</Text>
+            </View>
+
+            <View style={styles.profileContent}>
+                <TouchableOpacity style={styles.saveButton} onPress={atualizarFoto}>
+                    <Text style={styles.saveButtonText}>Salvar</Text>
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#fff',
   },
   profileHeader: {
     alignItems: 'center',

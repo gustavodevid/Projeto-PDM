@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import  styles  from './cadastro.styles';
 import config from '../../config';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Cadastro() {
   const router = useRouter();
@@ -41,7 +42,8 @@ export default function Cadastro() {
 
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+    <ScrollView>
       <Text style={styles.title}>Primeiro, precisamos conhecer você.</Text>
       <Text style={styles.description}>
           Depois, gostarámos de conhecer o seu pet.
@@ -52,7 +54,7 @@ export default function Cadastro() {
         placeholder="Digite seu nome completo"
         value={nome}
         onChangeText={setNome}
-      />
+        />
       <Text style={styles.label}>Seu Email</Text>
       <TextInput
         style={styles.input}
@@ -60,25 +62,29 @@ export default function Cadastro() {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
-      />
+        autoCapitalize="none"
+        />
       <Text style={styles.label}>Escolha uma senha</Text>
       <TextInput
         style={styles.input}
         placeholder="Digite uma senha forte"
         value={senha}
         onChangeText={setSenha}
+        autoCapitalize="none"
         secureTextEntry
-      />
+        />
       <TextInput
         style={styles.input}
         placeholder="Repita sua senha"
         value={confirmarSenha}
         onChangeText={setConfirmarSenha}
+        autoCapitalize="none"
         secureTextEntry
-      />
+        />
       <TouchableOpacity style={styles.button} onPress={handleCadastro}>
         <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
+        </SafeAreaView>
   );
 }

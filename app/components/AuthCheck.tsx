@@ -9,7 +9,7 @@ export default function AuthCheck() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const token = await AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem('token'); 
       if (token) {
         router.replace('/principal/home'); 
       } else {
