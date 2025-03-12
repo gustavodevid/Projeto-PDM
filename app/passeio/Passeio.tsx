@@ -9,7 +9,8 @@ import {
     Alert,
     Modal,
     TextInput,
-    Platform
+    Platform,
+    Image, 
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { Marker } from 'react-native-maps';
@@ -21,13 +22,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Geometry } from 'geojson';
-
-
+import getFullImagePath from '../utils/utils';
+import styles from './passeio.styles';
 interface Passeador {
     passeadorId: string;
     nome: string;
     latitude: string;
     longitude: string;
+    foto?: string;
 }
 
 interface Pet {
@@ -61,20 +63,56 @@ export default function Passeios() {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [date, setDate] = useState(new Date());
+    const [tutorFotoUri, setTutorFotoUri] = useState<string | null>(null);
+    const defaultImage = require('../../assets/images/cao-login.jpg');
 
     useEffect(() => {
-        const fetchPasseadores = async () => {
-            try {
-                const response = await axios.get<Passeador[]>(`${config.API_URL}/passeador`);
-                setPasseadores(response.data);
-            } catch (error) {
-                console.error('Erro ao buscar passeadores:', error);
-                Alert.alert('Erro', 'Erro ao buscar passeadores.');
-            }
-        };
+      fetchData();
+      const getUserPhoto = async () => {
+          const userId = await AsyncStorage.getItem('userId');
+          if (userId) {
+              fetchUserPhoto(userId);
+          }
+      };
+      getUserPhoto();
+  }, []);
 
-        fetchPasseadores();
-    }, []);
+    const fetchData = async () => {
+          try {
+              setLoading(true);
+              await fetchPasseadores();
+          } catch (error) {
+              console.error('Erro ao buscar dados:', error);
+              Alert.alert('Erro', 'Erro ao buscar dados. Tente novamente.');
+          } finally {
+              setLoading(false);
+          }
+      };
+
+    const fetchPasseadores = async () => {
+          try {
+            const response = await axios.get(`${config.API_URL}/passeador`);
+            const passeadoresComFoto = await Promise.all(response.data.map(async (passeador: any) => {
+                try {
+                    const passeadorDetalhes = await axios.get(`${config.API_URL}/passeador/${passeador.passeadorId}`);
+                    return {
+                        ...passeador,
+                        foto: passeadorDetalhes.data.foto,
+                    };
+                } catch (error) {
+                    console.error(`Erro ao buscar detalhes do passeador ${passeador.passeadorId}:`, error);
+                    return {
+                        ...passeador,
+                        foto: null,
+                    };
+                }
+            }));
+            setPasseadores(passeadoresComFoto);
+        } catch (error) {
+            console.error('Erro ao buscar passeadores:', error);
+            Alert.alert('Erro', 'Erro ao buscar passeadores.');
+        }
+      };
 
     useEffect(() => {
         (async () => {
@@ -88,6 +126,17 @@ export default function Passeios() {
             setLocation(location);
         })();
     }, []);
+
+    const fetchUserPhoto = async (userId: string) => {
+      try {
+          const response = await axios.get(`${config.API_URL}/tutor/${userId}`);
+          if (response.data && response.data.foto) {
+              setTutorFotoUri(response.data.foto);
+          }
+      } catch (error) {
+          console.error('Erro ao buscar foto do usuário:', error);
+      }
+  };
 
     const handleMarkerPress = (passeador: Passeador) => {
         setSelectedPasseador(passeador);
@@ -200,7 +249,16 @@ export default function Passeios() {
                             longitudeDelta: 0.0421,
                         }}
                     >
-                        <Marker coordinate={location.coords} title="Minha Localização" />
+                        <Marker coordinate={location.coords} title="Minha Localização">
+                        <View style={[styles.markerWrapper, styles.userMarkerWrapper]}>
+                          <Image
+                            source={tutorFotoUri ? {uri: getFullImagePath(tutorFotoUri) } : defaultImage}
+                            style={styles.markerImage} 
+                          />
+                         </View>
+                         <View style={[styles.markerPointer, styles.userMarkerPointer]} />
+                        </Marker>
+                        
                         {passeadores.map((passeador) => (
                             <Marker
                                 key={passeador.passeadorId}
@@ -210,10 +268,20 @@ export default function Passeios() {
                                 }}
                                 title={passeador.nome}
                                 onPress={() => handleMarkerPress(passeador)}
-                            />
+                            >
+                              <View style={[styles.markerWrapper, styles.userMarkerWrapper]}>
+                                <Image 
+                                  source={passeador.foto ? {uri: getFullImagePath(passeador.foto)  } : defaultImage}
+                                  style={styles.markerImage} 
+                                  onError={(e) => console.log(`Erro ao carregar imagem do passeador ${passeador.nome}:`, e.nativeEvent.error)}
+                                />
+                              <View style={styles.markerPointer} />
+                              </View>
+                            </Marker>
                         ))}
                     </MapView>
                 )}
+
             </ScrollView>
             <Modal visible={selectedPasseador !== null} animationType="slide" transparent={true}>
                 <View style={styles.modalContainer}>
@@ -282,186 +350,3 @@ export default function Passeios() {
     );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  petImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignSelf: 'center',
-    marginBottom: 10,
-  },
-  passeioCard: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  passeioTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  passeioText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  passeioButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-  },
-  passeioButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  cardText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  cardButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  cardButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  passeadorCard: {
-    marginRight: 10,
-    alignItems: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 15,
-  },
-  cancelButton: {
-    backgroundColor: '#FF6347',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  cancelButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  map: {
-    width: Dimensions.get('window').width - 40,
-    height: 700,
-    marginBottom: 20,
-    borderRadius: 10,
-    overflow: 'hidden',
-},
-modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-},
-modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-},
-modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-},
-modalButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 10,
-},
-modalButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-},
-modalCloseButton: {
-    backgroundColor: '#ccc',
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 10,
-},
-modalCloseButtonText: {
-    fontWeight: 'bold',
-},
-input: {
-  borderWidth: 1,
-  borderColor: '#ccc',
-  borderRadius: 5,
-  padding: 10,
-  marginBottom: 10,
-},
-petItem: {
-  padding: 10,
-  borderBottomWidth: 1,
-  borderBottomColor: '#eee',
-},
-closeButton: {
-  alignSelf: 'flex-end',
-  padding: 10,
-},
-closeButtonText: {
-  color: 'blue',
-  fontWeight: 'bold',
-},
-});

@@ -126,10 +126,10 @@ if (loading) {
                 }>
 
        {/* Input de Busca */}
-      /*<TouchableOpacity style={styles.searchInput} onPress={handleSearchPress}>
+      <TouchableOpacity style={styles.searchInput} onPress={handleSearchPress}>
                     <Ionicons name="search-outline" size={24} color="gray" />
                     <Text style={styles.searchText}>Buscar Passeio</Text>
-                </TouchableOpacity>*/
+                </TouchableOpacity>
         {/* Feed de Atividades */}
         {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Atividades Recentes</Text>
